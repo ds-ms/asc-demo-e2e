@@ -105,7 +105,7 @@ jobs:
         assessment-title: CodeQL Scan Results
         upload-sarif: ../results/go.sarif
         creds: ${{ secrets.AZURE_CREDENTIALS }}
-        web-app-name: e2edemoapp
+        web-app-name: ${{ env.APP_NAME }}
         resource-group: ${{ env.RESOURCE_GROUP }}
     
     - name: Check resource policy compliance post deployment
