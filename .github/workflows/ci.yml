@@ -31,12 +31,14 @@ jobs:
     
     - name: Docker login
       uses: azure/docker-login@v1
+      if: github.event.ref == 'refs/heads/master'
       with:
         login-server: dsmsacr.azurecr.io
         username: ${{ secrets.DOCKER_USERNAME }}
         password: ${{ secrets.DOCKER_PASSWORD }}
 
     - name: Push image
+      if: github.event.ref == 'refs/heads/master'
       run: |
         docker tag demo-e2e ${{ env.REGISTRY_NAME }}.azurecr.io/demo-e2e:${{ github.sha }}
         docker push ${{ env.REGISTRY_NAME }}.azurecr.io/demo-e2e:${{ github.sha }}
@@ -48,11 +50,13 @@ jobs:
         sarif_file: ${{ steps.imagescan.outputs.sarif-file-path }}
     
     - name: Login to Azure
+      if: github.event.ref == 'refs/heads/master'
       uses: azure/login@v1.1
       with:
         creds: ${{secrets.AZURE_CREDENTIALS}}
     
     - name: Set Web App ACR authentication
+      if: github.event.ref == 'refs/heads/master'
       uses: Azure/appservice-settings@v1
       with:
         app-name: ${{ env.APP_NAME }}
@@ -76,15 +80,18 @@ jobs:
           ]
     
     - name: Configure
+      if: github.event.ref == 'refs/heads/master'
       run: bash ./scripts/updateAppConfig.sh appConfig.json subscriptions/c00d16c7-6c1f-4c03-9be1-6934a4c49682/resourceGroups/${{ env.RESOURCE_GROUP }}/providers/Microsoft.Web/sites/${{ env.APP_NAME }}
     
     - name: Deploy
+      if: github.event.ref == 'refs/heads/master'
       uses: azure/webapps-deploy@v2
       with:
         app-name: ${{ env.APP_NAME }}
         images: ${{ env.REGISTRY_NAME }}.azurecr.io/demo-e2e:${{ github.sha }}
         
     - name: Upload Container Scan assessment to webapp
+      if: github.event.ref == 'refs/heads/master'
       uses: ds-ms/asc-assessment@master
       with:
         assessment-title: Container Scan Results
@@ -93,7 +100,7 @@ jobs:
         resource-group: ${{ env.RESOURCE_GROUP }}
 
     - name: Check resource policy compliance post deployment
+      if: github.event.ref == 'refs/heads/master'
       uses: ajinkya599/AzPac@azpac-initial
       with:
         scopes: /subscriptions/c00d16c7-6c1f-4c03-9be1-6934a4c49682/resourcegroups/${{ env.RESOURCE_GROUP }}/providers/Microsoft.Web/sites/${{ env.APP_NAME }}
-  
