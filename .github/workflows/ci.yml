@@ -27,7 +27,6 @@ jobs:
     - uses: ds-ms/container-scan@releases/v0
       name: Container Scan
       id: imagescan
-      continue-on-error: true
       with:
         image-name: demo-e2e
 
