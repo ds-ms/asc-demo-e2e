@@ -53,7 +53,7 @@ jobs:
     - name: Set Web App ACR authentication
       uses: Azure/appservice-settings@v1
       with:
-        app-name: 'e2edemoapp'
+        app-name: 'security-policy-app-dev'
         app-settings-json: |
           [
               {
@@ -74,23 +74,18 @@ jobs:
           ]
     
     - name: Configure
-      run: bash ./scripts/updateAppConfig.sh appConfig.json subscriptions/c00d16c7-6c1f-4c03-9be1-6934a4c49682/resourceGroups/az-pac-demo/providers/Microsoft.Web/sites/e2edemoapp
+      run: bash ./scripts/updateAppConfig.sh appConfig.json subscriptions/c00d16c7-6c1f-4c03-9be1-6934a4c49682/resourceGroups/az-pac-demo/providers/Microsoft.Web/sites/security-policy-app-dev
+
     
     - name: Deploy
       uses: azure/webapps-deploy@v2
       with:
-        app-name: 'e2edemoapp'
+        app-name: 'security-policy-app-dev'
         images: ${{ env.REGISTRY_NAME }}.azurecr.io/demo-e2e:${{ github.sha }}
-
-
-    - name: Login to Azure
-      uses: azure/login@v1.1
-      with:
-        creds: ${{secrets.AZURE_CREDENTIALS}}
 
     - name: Check resource policy compliance post deployment
       uses: ajinkya599/AzPac@azpac-initial
       with:
         scopes: |
-          /subscriptions/c00d16c7-6c1f-4c03-9be1-6934a4c49682/resourcegroups/az-pac-demo/providers/Microsoft.Web/sites/e2edemoapp
+          /subscriptions/c00d16c7-6c1f-4c03-9be1-6934a4c49682/resourcegroups/az-pac-demo/providers/Microsoft.Web/sites/security-policy-app-dev
   
