@@ -10,14 +10,14 @@ general:
   - CVE-2019-19074
   - CVE-2019-19813
   - CVE-2019-19814
-  #- CVE-2019-19815
-  #- CVE-2019-19816
-  #- CVE-2020-13974
+  # - CVE-2019-19815
+  # - CVE-2019-19816
+  # - CVE-2020-13974
   bestPracticeViolations:
   - CIS-DI-0009
   - CIS-DI-0001
   - DKL-DI-0006
   - CIS-DI-0005
-  #- CIS-DI-0006
-  #- CIS-DI-0008
-  #- DKL-LI-0003
+  # - CIS-DI-0006
+  # - CIS-DI-0008
+  # - DKL-LI-0003
