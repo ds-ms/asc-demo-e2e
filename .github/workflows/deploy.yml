@@ -112,3 +112,105 @@ jobs:
       uses: ajinkya599/AzPac@azpac-initial
       with:
         scopes: /subscriptions/c00d16c7-6c1f-4c03-9be1-6934a4c49682/resourcegroups/${{ env.RESOURCE_GROUP }}/providers/Microsoft.Web/sites/${{ env.APP_NAME }}
+
+  prod:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        fetch-depth: 2
+    
+    - name: Building the Docker image
+      run: |
+        docker build . --tag demo-e2e
+    
+    - uses: ds-ms/container-scan@releases/v0
+      name: Container Scan
+      id: imagescan
+      with:
+        image-name: demo-e2e
+
+    - name: Initialize CodeQL
+      uses: github/codeql-action/init@v1
+
+    - name: Autobuild CodeQL
+      uses: github/codeql-action/autobuild@v1
+
+    - name: Perform CodeQL Analysis
+      uses: github/codeql-action/analyze@v1
+      
+    - name: Docker login
+      uses: azure/docker-login@v1
+      with:
+        login-server: dsmsacr.azurecr.io
+        username: ${{ secrets.DOCKER_USERNAME }}
+        password: ${{ secrets.DOCKER_PASSWORD }}
+
+    - name: Push image
+      run: |
+        docker tag demo-e2e ${{ env.REGISTRY_NAME }}.azurecr.io/demo-e2e:${{ github.sha }}
+        docker push ${{ env.REGISTRY_NAME }}.azurecr.io/demo-e2e:${{ github.sha }}
+
+    - name: Upload Container Scan Report
+      uses: github/codeql-action/upload-sarif@v1
+      with:
+        sarif_file: ${{ steps.imagescan.outputs.sarif-file-path }}
+    
+    - name: Login to Azure
+      uses: azure/login@v1.1
+      with:
+        creds: ${{secrets.AZURE_CREDENTIALS}}
+    
+    - name: Set Web App ACR authentication
+      uses: Azure/appservice-settings@v1
+      with:
+        app-name: ${{ env.APP_NAME }}
+        app-settings-json: |
+          [
+              {
+                  "name": "DOCKER_REGISTRY_SERVER_PASSWORD",
+                  "value": "${{ secrets.DOCKER_PASSWORD }}",
+                  "slotSetting": false
+              },
+              {
+                  "name": "DOCKER_REGISTRY_SERVER_URL",
+                  "value": "${{ env.REGISTRY_NAME }}.azurecr.io",
+                  "slotSetting": false
+              },
+              {
+                  "name": "DOCKER_REGISTRY_SERVER_USERNAME",
+                  "value": "${{ secrets.DOCKER_USERNAME  }}",
+                  "slotSetting": false
+              }
+          ]
+    
+    - name: Configure
+      run: bash ./scripts/updateAppConfig.sh appConfig.json subscriptions/c00d16c7-6c1f-4c03-9be1-6934a4c49682/resourceGroups/${{ env.RESOURCE_GROUP }}/providers/Microsoft.Web/sites/${{ env.APP_NAME }}
+    
+    - name: Deploy
+      uses: azure/webapps-deploy@v2
+      with:
+        app-name: ${{ env.APP_NAME }}
+        images: ${{ env.REGISTRY_NAME }}.azurecr.io/demo-e2e:${{ github.sha }}
+        
+    - name: Upload Container Scan assessment to webapp
+      uses: ds-ms/asc-assessment@master
+      with:
+        assessment-title: Container Scan Results
+        creds: ${{ secrets.AZURE_CREDENTIALS }}
+        web-app-name: ${{ env.APP_NAME }}
+        resource-group: ${{ env.RESOURCE_GROUP }}
+    
+    - name: Upload CodeQL Scan assessment to webapp
+      uses: ds-ms/asc-assessment@master
+      with:
+        assessment-title: CodeQL Scan Results
+        upload-sarif: ../results/go.sarif
+        creds: ${{ secrets.AZURE_CREDENTIALS }}
+        web-app-name: ${{ env.APP_NAME }}
+        resource-group: ${{ env.RESOURCE_GROUP }}
+    
+    - name: Check resource policy compliance post deployment
+      uses: ajinkya599/AzPac@azpac-initial
+      with:
+        scopes: /subscriptions/c00d16c7-6c1f-4c03-9be1-6934a4c49682/resourcegroups/${{ env.RESOURCE_GROUP }}/providers/Microsoft.Web/sites/${{ env.APP_NAME }}
