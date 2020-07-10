@@ -112,6 +112,7 @@ jobs:
     
     - name: Upload CodeQL Scan assessment to webapp
       uses: ds-ms/asc-assessment@master
+      if: github.event.ref == 'refs/heads/master'
       with:
         assessment-title: CodeQL Scan Results
         upload-sarif: ../results/go.sarif
