@@ -17,6 +17,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
+      with:
+        depth: 2
     
     - name: Building the Docker image
       run: |
@@ -28,7 +30,16 @@ jobs:
       continue-on-error: true
       with:
         image-name: demo-e2e
-    
+
+    - name: Initialize CodeQL
+      uses: github/codeql-action/init@v1
+
+    - name: Autobuild CodeQL
+      uses: github/codeql-action/autobuild@v1
+
+    - name: Perform CodeQL Analysis
+      uses: github/codeql-action/analyze@v1
+      
     - name: Docker login
       uses: azure/docker-login@v1
       if: github.event.ref == 'refs/heads/master'
@@ -98,7 +109,17 @@ jobs:
         creds: ${{ secrets.AZURE_CREDENTIALS }}
         web-app-name: ${{ env.APP_NAME }}
         resource-group: ${{ env.RESOURCE_GROUP }}
-
+    
+    - name: Upload CodeQL Scan assessment to webapp
+      uses: ds-ms/asc-assessment@master
+      if: github.event.ref == 'refs/heads/master'
+      with:
+        assessment-title: CodeQL Scan Results
+        upload-sarif: ../results/go.sarif
+        creds: ${{ secrets.AZURE_CREDENTIALS }}
+        web-app-name: e2edemoapp
+        resource-group: ${{ env.RESOURCE_GROUP }}
+    
     - name: Check resource policy compliance post deployment
       if: github.event.ref == 'refs/heads/master'
       uses: ajinkya599/AzPac@azpac-initial
