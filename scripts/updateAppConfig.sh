@@ -1,5 +1,5 @@
 token=$(az account get-access-token --resource=https://management.azure.com | jq -r .accessToken)
-configInput=$(cat ./$1)
+configInput=$(cat ./scripts/$1)
 echo ">> $1"
 echo ">> $2"
 echo ">> $configInput"
