@@ -1,7 +1,7 @@
 {
     "properties": {
         "httpsOnly": "true",
-        "deploymentId": "e2edemoapp",
+        "deploymentId": "security-policy-app-dev",
         "trafficManagerHostNames": null,
         "sku": "Basic",
         "scmSiteAlsoStopped": false,
