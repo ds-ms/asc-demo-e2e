@@ -110,7 +110,7 @@ jobs:
         resource-group: ${{ env.RESOURCE_GROUP }}
     
     - name: Check resource policy compliance post deployment
-      uses: ajinkya599/AzPac@remediationsteps
+      uses: ajinkya599/AzPac@release-1.0.2
       with:
         scopes: /subscriptions/c00d16c7-6c1f-4c03-9be1-6934a4c49682/resourcegroups/${{ env.RESOURCE_GROUP }}/providers/Microsoft.Web/sites/${{ env.APP_NAME }}
 
@@ -213,6 +213,6 @@ jobs:
         resource-group: ${{ env.RESOURCE_GROUP }}
     
     - name: Check resource policy compliance post deployment
-      uses: ajinkya599/AzPac@remediationsteps
+      uses: ajinkya599/AzPac@release-1.0.2
       with:
         scopes: /subscriptions/c00d16c7-6c1f-4c03-9be1-6934a4c49682/resourcegroups/${{ env.RESOURCE_GROUP }}/providers/Microsoft.Web/sites/${{ env.PROD_APP_NAME }}
