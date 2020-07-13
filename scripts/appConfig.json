@@ -1,6 +1,6 @@
 {
     "properties": {
-        "httpsOnly": "true",
+        "httpsOnly": "false",
         "deploymentId": "security-policy-app-dev",
         "trafficManagerHostNames": null,
         "sku": "Basic",

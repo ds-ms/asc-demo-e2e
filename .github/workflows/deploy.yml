@@ -8,6 +8,7 @@ env:
   REGISTRY_NAME: dsmsacr
   NAMESPACE: demo-e2e
   APP_NAME: security-policy-app-dev
+  PROD_APP_NAME: security-policy-app-dev
   RESOURCE_GROUP: az-pac-demo
 
 jobs:
@@ -109,7 +110,7 @@ jobs:
         resource-group: ${{ env.RESOURCE_GROUP }}
     
     - name: Check resource policy compliance post deployment
-      uses: ajinkya599/AzPac@azpac-initial
+      uses: ajinkya599/AzPac@remediationsteps
       with:
         scopes: /subscriptions/c00d16c7-6c1f-4c03-9be1-6934a4c49682/resourcegroups/${{ env.RESOURCE_GROUP }}/providers/Microsoft.Web/sites/${{ env.APP_NAME }}
 
@@ -165,7 +166,7 @@ jobs:
     - name: Set Web App ACR authentication
       uses: Azure/appservice-settings@v1
       with:
-        app-name: ${{ env.APP_NAME }}
+        app-name: ${{ env.PROD_APP_NAME }}
         app-settings-json: |
           [
               {
@@ -191,7 +192,7 @@ jobs:
     - name: Deploy
       uses: azure/webapps-deploy@v2
       with:
-        app-name: ${{ env.APP_NAME }}
+        app-name: ${{ env.PROD_APP_NAME }}
         images: ${{ env.REGISTRY_NAME }}.azurecr.io/demo-e2e:${{ github.sha }}
         
     - name: Upload Container Scan assessment to webapp
@@ -199,7 +200,7 @@ jobs:
       with:
         assessment-title: Container Scan Results
         creds: ${{ secrets.AZURE_CREDENTIALS }}
-        web-app-name: ${{ env.APP_NAME }}
+        web-app-name: ${{ env.PROD_APP_NAME }}
         resource-group: ${{ env.RESOURCE_GROUP }}
     
     - name: Upload CodeQL Scan assessment to webapp
@@ -208,10 +209,10 @@ jobs:
         assessment-title: CodeQL Scan Results
         upload-sarif: ../results/go.sarif
         creds: ${{ secrets.AZURE_CREDENTIALS }}
-        web-app-name: ${{ env.APP_NAME }}
+        web-app-name: ${{ env.PROD_APP_NAME }}
         resource-group: ${{ env.RESOURCE_GROUP }}
     
     - name: Check resource policy compliance post deployment
-      uses: ajinkya599/AzPac@release-1.0.1
+      uses: ajinkya599/AzPac@remediationsteps
       with:
-        scopes: /subscriptions/c00d16c7-6c1f-4c03-9be1-6934a4c49682/resourcegroups/${{ env.RESOURCE_GROUP }}/providers/Microsoft.Web/sites/${{ env.APP_NAME }}
+        scopes: /subscriptions/c00d16c7-6c1f-4c03-9be1-6934a4c49682/resourcegroups/${{ env.RESOURCE_GROUP }}/providers/Microsoft.Web/sites/${{ env.PROD_APP_NAME }}
