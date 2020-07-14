@@ -1,7 +1,7 @@
 {
     "properties": {
-        "httpsOnly": "true",
-        "deploymentId": "security-policy-app-dev",
+        "httpsOnly": "false",
+        "deploymentId": "security-policy-app-staging",
         "trafficManagerHostNames": null,
         "sku": "Basic",
         "scmSiteAlsoStopped": false,

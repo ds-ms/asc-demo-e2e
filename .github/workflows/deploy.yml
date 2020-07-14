@@ -7,7 +7,7 @@ on:
 env:
   REGISTRY_NAME: dsmsacr
   NAMESPACE: demo-e2e
-  APP_NAME: security-policy-app-dev
+  APP_NAME: security-policy-app-staging
   PROD_APP_NAME: security-policy-app-prod
   RESOURCE_GROUP: az-pac-demo
 
